@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คำเชิญฮาโลวีน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one centered invitation card-less scene — moon, question, two buttons; bats cross a night sky on canvas. */
+:root {
+  --night: #120a1f;
+  --night-2: #241238;
+  --pumpkin: #ff7a1a;
+  --pumpkin-deep: #c24a00;
+  --bone: #f6ead7;
+  --web: #8f7bb0;
+  --font-display: "Chonburi", "Noto Serif Thai", Georgia, serif;
+  --font-body: "Sarabun", "Noto Sans Thai", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  padding-inline: 16px;
+  background: radial-gradient(120% 90% at 50% 0%, var(--night-2) 0%, var(--night) 60%);
+  color: var(--bone);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.moon {
+  position: fixed; top: 6vh; right: 8vw;
+  width: clamp(70px, 14vw, 140px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6df 0%, #f0d9a8 55%, #cfae72 100%);
+  box-shadow: 0 0 80px 20px rgba(255, 214, 140, .25);
+}
+.moon::after {
+  content: ""; position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%;
+  left: 52%; top: 55%; background: rgba(150, 115, 60, .25);
+  box-shadow: -45% -90% 0 -2% rgba(150,115,60,.2), -120% 20% 0 2% rgba(150,115,60,.18);
+}
+main {
+  position: relative; z-index: 2;
+  height: 100%; max-width: 640px; margin-inline: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2.2rem; text-align: center; padding-block: 2rem;
+}
+.countdown {
+  font-size: .85rem; letter-spacing: .12em; color: var(--web);
+  font-variant-numeric: tabular-nums;
+}
+h1 {
+  margin: 0; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2rem, 7.5vw, 3.6rem); line-height: 1.25; text-wrap: balance;
+  color: var(--bone); text-shadow: 0 0 28px rgba(255,122,26,.45);
+}
+h1 em { font-style: normal; color: var(--pumpkin); }
+.hint { margin: 0; min-height: 1.6em; color: var(--web); font-size: 1rem; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1rem; min-height: 5rem; }
+button {
+  font: inherit; font-weight: 600; font-size: 1.15rem; cursor: pointer;
+  padding: .85rem 1.8rem; border-radius: 999px; border: 2px solid transparent;
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
+#yes {
+  background: linear-gradient(180deg, var(--pumpkin), var(--pumpkin-deep));
+  color: #1a0b00; box-shadow: 0 0 24px rgba(255,122,26,.5);
+  transform: scale(var(--grow, 1)); transform-origin: center;
+}
+#yes:hover { box-shadow: 0 0 40px rgba(255,122,26,.8); }
+#no { background: transparent; color: var(--bone); border-color: var(--web); }
+#no.loose { position: fixed; z-index: 5; transition: left .25s ease, top .25s ease; }
+.party[hidden] { display: none; }
+.party { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+.party p { margin: 0; font-size: 1.1rem; max-width: 30ch; text-wrap: balance; }
+.pumpkin { font-size: clamp(4rem, 16vw, 7rem); line-height: 1; animation: bob 2.4s ease-in-out infinite; filter: drop-shadow(0 0 24px rgba(255,122,26,.6)); }
+#again { background: transparent; color: var(--web); border-color: var(--web); font-size: .95rem; padding: .5rem 1.2rem; }
+@keyframes bob { 50% { transform: translateY(-10px) rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { .pumpkin { animation: none; } #no.loose { transition: none; } }
+.scare { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; background: #000; }
+.scare.on { display: flex; animation: shake .08s linear infinite, flash .18s steps(2) infinite; }
+.scare svg { width: min(90vw, 90vh * .83); height: auto; filter: drop-shadow(0 0 40px #ff1a1a); animation: lunge .25s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes lunge { from { transform: scale(.15); } to { transform: scale(1.25); } }
+@keyframes shake { 0% { transform: translate(8px, -6px); } 25% { transform: translate(-9px, 7px); } 50% { transform: translate(6px, 9px); } 75% { transform: translate(-7px, -8px); } 100% { transform: translate(8px, -6px); } }
+@keyframes flash { 50% { background: #5a0000; } }
+@media (prefers-reduced-motion: reduce) { .scare.on, .scare svg { animation: none; } }
+</style>
+
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="moon" aria-hidden="true"></div>
+
+<div class="scare" id="scare" aria-hidden="true">
+  <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 120C20 50 60 10 100 10s80 40 80 110v110l-25-25-25 25-30-25-30 25-25-25-25 25z" fill="#f6ead7"/>
+    <ellipse cx="72" cy="100" rx="14" ry="24" fill="#000"/>
+    <ellipse cx="128" cy="100" rx="14" ry="24" fill="#000"/>
+    <ellipse cx="100" cy="168" rx="24" ry="36" fill="#000"/>
+  </svg>
+</div>
+
+<main>
+  <div id="ask" class="ask">
+    <p class="countdown" id="countdown"></p>
+    <h1>มาฉลอง<em>ฮาโลวีน</em><br>กับฉันไหม?</h1>
+  </div>
+  <p class="hint" id="hint"></p>
+  <div class="actions" id="actions">
+    <button id="yes" type="button">🎃 ไปสิ</button>
+    <button id="no" type="button">🕸 ไม่ไป</button>
+  </div>
+  <section class="party" id="party" hidden>
+    <div class="pumpkin" aria-hidden="true">🎃</div>
+    <h1>เจอกัน<br><em>คืนวันที่ 31 ตุลาคม</em></h1>
+    <p>แต่งตัวมาให้น่ากลัวที่สุดนะ แล้วอย่าลืมถุงใส่ขนม</p>
+    <button id="again" type="button">กลับไปถามใหม่</button>
+  </section>
+</main>
+
+<script>
+(function () {
+  var yes = document.getElementById('yes');
+  var no = document.getElementById('no');
+  var hint = document.getElementById('hint');
+  var ask = document.getElementById('ask');
+  var actions = document.getElementById('actions');
+  var party = document.getElementById('party');
+  var again = document.getElementById('again');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Countdown to 31 October
+  var now = new Date();
+  var target = new Date(now.getFullYear(), 9, 31);
+  if (now > new Date(now.getFullYear(), 9, 31, 23, 59)) target = new Date(now.getFullYear() + 1, 9, 31);
+  var days = Math.ceil((target - now) / 864e5);
+  document.getElementById('countdown').textContent =
+    days === 0 ? 'คืนนี้คือคืนฮาโลวีน' : 'อีก ' + days + ' คืนถึงฮาโลวีน';
+
+  // Clicking "no" sets off the ghost jump scare.
+  var scare = document.getElementById('scare');
+  var lines = [
+    'ตกใจไหม? ลองกดอีกทีสิ',
+    'ผียังรออยู่นะ',
+    'ยังจะกดอีกเหรอ…',
+    'กดปุ่มส้มเถอะนะ'
+  ];
+  var tries = 0, grow = 1, audio = null, busy = false;
+
+  function scream() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audio = audio || new AC();
+      if (audio.state === 'suspended') audio.resume();
+      var t0 = audio.currentTime, dur = 1.6;
+      var comp = audio.createDynamicsCompressor();
+      comp.threshold.value = -30; comp.ratio.value = 20; comp.attack.value = 0.001;
+      var master = audio.createGain();
+      master.gain.setValueAtTime(1, t0);
+      master.gain.setValueAtTime(1, t0 + dur - 0.2);
+      master.gain.linearRampToValueAtTime(0, t0 + dur);
+      master.connect(comp); comp.connect(audio.destination);
+
+      var curve = new Float32Array(1024);
+      for (var i = 0; i < 1024; i++) { var x = i / 512 - 1; curve[i] = Math.tanh(x * 12); }
+      var shaper = audio.createWaveShaper(); shaper.curve = curve; shaper.oversample = '4x';
+      var sg = audio.createGain(); sg.gain.value = 0.9;
+      shaper.connect(sg); sg.connect(master);
+
+      // two dissonant, rising screeches with fast vibrato
+      [[820, 1900], [873, 2050]].forEach(function (f) {
+        var o = audio.createOscillator(); o.type = 'sawtooth';
+        o.frequency.setValueAtTime(f[0], t0);
+        o.frequency.exponentialRampToValueAtTime(f[1], t0 + 0.6);
+        o.frequency.exponentialRampToValueAtTime(f[0] * 1.2, t0 + dur);
+        var lfo = audio.createOscillator(), lg = audio.createGain();
+        lfo.frequency.value = 22; lg.gain.value = 90;
+        lfo.connect(lg); lg.connect(o.frequency);
+        o.connect(shaper); o.start(t0); lfo.start(t0); o.stop(t0 + dur); lfo.stop(t0 + dur);
+      });
+
+      // noise burst
+      var len = Math.floor(audio.sampleRate * dur);
+      var buf = audio.createBuffer(1, len, audio.sampleRate), d = buf.getChannelData(0);
+      for (var n = 0; n < len; n++) d[n] = Math.random() * 2 - 1;
+      var src = audio.createBufferSource(); src.buffer = buf;
+      var bp = audio.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
+      bp.frequency.setValueAtTime(600, t0); bp.frequency.exponentialRampToValueAtTime(5000, t0 + 0.5);
+      var ng = audio.createGain(); ng.gain.setValueAtTime(1, t0); ng.gain.exponentialRampToValueAtTime(0.2, t0 + dur);
+      src.connect(bp); bp.connect(ng); ng.connect(master); src.start(t0);
+
+      // low boom on impact
+      var boom = audio.createOscillator(), bg = audio.createGain();
+      boom.type = 'sine'; boom.frequency.setValueAtTime(90, t0); boom.frequency.exponentialRampToValueAtTime(28, t0 + 0.5);
+      bg.gain.setValueAtTime(1, t0); bg.gain.exponentialRampToValueAtTime(0.01, t0 + 0.7);
+      boom.connect(bg); bg.connect(master); boom.start(t0); boom.stop(t0 + 0.8);
+    } catch (e) {}
+  }
+
+  function jumpScare() {
+    if (busy) return;
+    busy = true;
+    scream();
+    try { navigator.vibrate && navigator.vibrate([200, 60, 300]); } catch (e) {}
+    scare.classList.remove('on'); void scare.offsetWidth; scare.classList.add('on');
+    setTimeout(function () {
+      scare.classList.remove('on'); busy = false;
+      hint.textContent = lines[Math.min(tries, lines.length - 1)];
+      tries++; grow = Math.min(grow + 0.2, 2.4);
+      yes.style.setProperty('--grow', grow);
+    }, 1600);
+  }
+  no.addEventListener('click', jumpScare);
+
+  function celebrate() {
+    ask.hidden = true; actions.hidden = true; hint.hidden = true;
+    party.hidden = false;
+    burst();
+  }
+  yes.addEventListener('click', celebrate);
+  again.addEventListener('click', function () {
+    party.hidden = true; ask.hidden = false; actions.hidden = false; hint.hidden = false;
+    tries = 0; grow = 1; yes.style.setProperty('--grow', 1); hint.textContent = '';
+        confetti.length = 0;
+  });
+
+  // Night sky: stars, bats, and a pumpkin burst on "yes".
+  var cv = document.getElementById('sky');
+  var ctx = cv.getContext('2d');
+  var W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+  var stars = [], bats = [], confetti = [];
+
+  function resize() {
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = [];
+    for (var i = 0; i < Math.round(W * H / 9000); i++)
+      stars.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.2 + .3, p: Math.random() * 6 });
+  }
+  addEventListener('resize', resize);
+  resize();
+
+  function newBat(fromLeft) {
+    var s = 14 + Math.random() * 22;
+    return { x: fromLeft ? -40 : Math.random() * W, y: Math.random() * H * .6, s: s,
+             vx: (.6 + Math.random() * 1.2) * (s / 24), ph: Math.random() * 6, wob: Math.random() * 40 + 10 };
+  }
+  for (var b = 0; b < 7; b++) bats.push(newBat(false));
+
+  function drawBat(bt, t) {
+    var f = Math.sin(t * .012 + bt.ph) * .6;
+    var y = bt.y + Math.sin(t * .002 + bt.ph) * bt.wob;
+    var s = bt.s;
+    ctx.save();
+    ctx.translate(bt.x, y);
+    ctx.fillStyle = '#05020a';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(s * .6, -s * (.9 + f), s * 1.4, -s * .1 * (1 + f));
+    ctx.quadraticCurveTo(s * 1.0, s * .15, s * .7, s * .05);
+    ctx.quadraticCurveTo(s * .35, s * .3, 0, s * .25);
+    ctx.quadraticCurveTo(-s * .35, s * .3, -s * .7, s * .05);
+    ctx.quadraticCurveTo(-s * 1.0, s * .15, -s * 1.4, -s * .1 * (1 + f));
+    ctx.quadraticCurveTo(-s * .6, -s * (.9 + f), 0, 0);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function burst() {
+    if (reduce) return;
+    var icons = ['🎃', '🦇', '👻', '🕸', '🍬'];
+    for (var i = 0; i < 70; i++) {
+      confetti.push({ x: W / 2, y: H / 2, vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 3,
+        g: .28, ch: icons[i % icons.length], sz: 18 + Math.random() * 20, rot: Math.random() * 6, vr: (Math.random() - .5) * .2 });
+    }
+  }
+
+  function frame(t) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#f6ead7';
+    for (var i = 0; i < stars.length; i++) {
+      var st = stars[i];
+      ctx.globalAlpha = .35 + .45 * Math.abs(Math.sin(t * .001 + st.p));
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 6.283); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    for (var j = 0; j < bats.length; j++) {
+      var bt = bats[j];
+      if (!reduce) bt.x += bt.vx;
+      if (bt.x > W + 60) bats[j] = newBat(true);
+      drawBat(bt, t);
+    }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (var k = confetti.length - 1; k >= 0; k--) {
+      var c = confetti[k];
+      c.x += c.vx; c.y += c.vy; c.vy += c.g; c.rot += c.vr;
+      if (c.y > H + 40) { confetti.splice(k, 1); continue; }
+      ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rot);
+      ctx.font = c.sz + 'px sans-serif'; ctx.fillText(c.ch, 0, 0); ctx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
